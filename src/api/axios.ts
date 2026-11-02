@@ -2,7 +2,7 @@ import axios, { type AxiosError, type AxiosInstance } from 'axios';
 import { CSRF_HEADER, needsCSRFToken, readCSRFToken } from '@/lib/csrf';
 import { toApiError } from '@/lib/errors';
 import { redirectToLogin } from '@/lib/navigate';
-import { RECOMMENDATIONS_API_BASE, ENDPOINTS } from './endpoints';
+import { RECOMMENDATIONS_API_BASE, ENDPOINTS, APP_ID, APP_ID_HEADER } from './endpoints';
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: RECOMMENDATIONS_API_BASE,
@@ -12,6 +12,10 @@ const axiosInstance: AxiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use((config) => {
+  if (APP_ID !== '') {
+    config.headers[APP_ID_HEADER] = APP_ID;
+  }
+
   if (needsCSRFToken(config.method)) {
     const token = readCSRFToken();
     if (token !== null) {

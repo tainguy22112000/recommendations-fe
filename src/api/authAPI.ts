@@ -1,16 +1,22 @@
 import { ApiEnvelope } from '@/types/api';
 import { MeResponse } from '@/types/auth';
-import { BaseCursorAPI } from './baseCursorAPI';
-import { AUTH_API_BASE, ENDPOINTS } from './endpoints';
+import { BaseCursorAPI, serializeParams } from './baseCursorAPI';
+import { APP_ID, APP_ID_PARAM, AUTH_API_BASE, ENDPOINTS } from './endpoints';
 
 class BaseAuthAPI extends BaseCursorAPI {
   constructor() {
-    // The auth service, not the recommendations service the shared instance defaults to.
     super(AUTH_API_BASE);
   }
 
   getGoogleSignInURL(): string {
-    return `${AUTH_API_BASE}${ENDPOINTS.AUTH_GOOGLE_LOGIN}`;
+    const url = `${AUTH_API_BASE}${ENDPOINTS.AUTH_GOOGLE_LOGIN}`;
+    const query = serializeParams({ [APP_ID_PARAM]: APP_ID });
+
+    if (query === '') {
+      return url;
+    }
+
+    return `${url}?${query}`;
   }
   async fetchMe(): Promise<MeResponse> {
     const { data } = await this.get<ApiEnvelope<MeResponse>>(ENDPOINTS.ME);
