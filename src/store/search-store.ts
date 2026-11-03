@@ -3,7 +3,7 @@ import { create } from 'zustand';
 
 import { DEFAULT_QUERY } from '@/lib/search';
 import { AREAS, STREETS, WARDS } from '@/mocks/places';
-import { SearchQuery } from '@/types/place';
+import type { SearchQuery } from '@/types/place';
 
 const DEFAULT_ORIGIN = 'Võ Văn Tần';
 
@@ -58,7 +58,7 @@ function describe(query: SearchQuery): { locationLabel: string; originLabel: str
 
 // Each value is selected atomically. A selector returning a fresh object would fail
 // zustand's Object.is check on every store write and re-render all consumers.
-export function useSearch() {
+export function useSearch(): Pick<SearchState, 'query' | 'update'> & ReturnType<typeof describe> {
   const query = useSearchStore((state) => {
     return state.query;
   });

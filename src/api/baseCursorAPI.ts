@@ -1,14 +1,14 @@
 export { default as axiosInstance } from './axios';
-import { AxiosRequestConfig } from 'axios';
+import type { AxiosRequestConfig } from 'axios';
 import axiosInstance from './axios';
-import { ICursorResponse } from '@/types/api';
+import type { CursorResponse } from '@/types/api';
 
-export interface ICursorAPI {
+export interface CursorAPI {
   getList<T>(
     url: string,
     params?: object,
     options?: AxiosRequestConfig,
-  ): Promise<ICursorResponse<T>>;
+  ): Promise<CursorResponse<T>>;
   get<T>(url: string, params?: object, options?: AxiosRequestConfig): Promise<T>;
   post<T>(url: string, input?: object, options?: AxiosRequestConfig): Promise<T>;
   put<T>(url: string, input?: object, options?: AxiosRequestConfig): Promise<T>;
@@ -43,7 +43,7 @@ function withQuery(url: string, params?: object): string {
   return search === '' ? url : `${url}?${search}`;
 }
 
-export class BaseCursorAPI implements ICursorAPI {
+export class BaseCursorAPI implements CursorAPI {
   // Auth and recommendations are separate services on separate origins, so each API
   // overrides the shared instance's baseURL per request. One instance keeps the CSRF and
   // 401 interceptors applying to both.
@@ -61,8 +61,8 @@ export class BaseCursorAPI implements ICursorAPI {
     url: string,
     params?: object,
     options?: AxiosRequestConfig,
-  ): Promise<ICursorResponse<T>> {
-    const { data } = await axiosInstance.get<ICursorResponse<T>>(
+  ): Promise<CursorResponse<T>> {
+    const { data } = await axiosInstance.get<CursorResponse<T>>(
       withQuery(url, params),
       this.config(options),
     );

@@ -1,16 +1,16 @@
 // Mock dataset and a server emulation (filter, sort, paginate, count).
 //
-// This is the ONLY place fixtures live. `api/places.ts` is the seam: when the real API
+// This is the ONLY place fixtures live. `api/placesAPI.ts` is the seam: when the real API
 // exists, that file changes and nothing else does. Keep the emulation honest — if the
 // server would do it, do it here, not in a component.
 
-import { ICursorParams } from '@/types/api';
-import {
+import type { CursorParams } from '@/types/api';
+import type {
   Area,
   LocationHit,
   PlaceDetail,
   PlaceCursorPage,
-  IPlace,
+  Place,
   SearchQuery,
   Street,
   Ward,
@@ -52,7 +52,7 @@ export const STREETS: Street[] = [
   { id: 'phandinhphung', ward_id: 'phunhuan1', name: 'Phan Đình Phùng' },
 ];
 
-interface MockPlace extends IPlace {
+interface MockPlace extends Place {
   ward_id: string;
   street_id: string;
   address: string;
@@ -549,7 +549,7 @@ export function queryPlaceCount(query: SearchQuery): number {
   return selectPlaces(query).length;
 }
 
-export function queryPlaces(query: SearchQuery, params: ICursorParams = {}): PlaceCursorPage {
+export function queryPlaces(query: SearchQuery, params: CursorParams = {}): PlaceCursorPage {
   const matched = selectPlaces(query);
   const limit = params.limit ?? PAGE_SIZE;
   // A real backend decodes an opaque cursor; the mock uses the offset as its payload.

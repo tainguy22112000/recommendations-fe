@@ -7,7 +7,7 @@ import { useLocationSearch } from '@/hooks/usePlaces';
 import { CheckIcon, ChevronRightIcon, ClockIcon, LocateIcon, SearchIcon } from '@/lib/icons';
 import { AREAS, STREETS, WARDS } from '@/mocks/places';
 import { cn } from 'cn';
-import { LocationSelection } from '@/types/place';
+import type { LocationSelection } from '@/types/place';
 
 interface Props {
   open: boolean;
@@ -25,10 +25,25 @@ interface Draft {
 
 const RECENTS_KEY = 'recentLocations';
 
+function isLocationSelection(value: unknown): value is LocationSelection {
+  if (typeof value !== 'object' || value === null || !('label' in value)) {
+    return false;
+  }
+
+  return Object.values(value).every((field) => typeof field === 'string');
+}
+
 function readRecents(): LocationSelection[] {
+  const raw = localStorage.getItem(RECENTS_KEY);
+  if (raw === null) {
+    return [];
+  }
+
+  // Recents are a convenience: corrupt storage just means an empty list.
   try {
-    const raw = localStorage.getItem(RECENTS_KEY);
-    return raw === null ? [] : (JSON.parse(raw) as LocationSelection[]);
+    const parsed: unknown = JSON.parse(raw);
+
+    return Array.isArray(parsed) ? parsed.filter(isLocationSelection) : [];
   } catch {
     return [];
   }
@@ -81,12 +96,13 @@ export default function LocationSheet({ open, onOpenChange, onApply, autoFocusSe
     }
   }, [open, autoFocusSearch]);
 
-  useEffect(() => {
-    if (!open) {
+  function handleOpenChange(nextOpen: boolean): void {
+    if (!nextOpen) {
       setTerm('');
       setLocateError(false);
     }
-  }, [open]);
+    onOpenChange(nextOpen);
+  }
 
   function selectArea(area_id: string): void {
     // Choosing a level clears the deeper ones, or the query ends up with a street in the
@@ -107,20 +123,29 @@ export default function LocationSheet({ open, onOpenChange, onApply, autoFocusSe
     setTerm('');
   }
 
-  function useCurrentLocation(): void {
+  async function applyPosition(position: GeolocationPosition): Promise<void> {
+    try {
+      const hit = await PlaceAPI.reverseGeocode(
+        position.coords.latitude,
+        position.coords.longitude,
+      );
+      setDraft(hit);
+      setLevel(3);
+    } catch {
+      setLocateError(true);
+    } finally {
+      setLocating(false);
+    }
+  }
+
+  function locateUser(): void {
     // Geolocation needs HTTPS and must only ever fire on a tap, never on mount.
     setLocating(true);
     setLocateError(false);
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        void PlaceAPI.reverseGeocode(position.coords.latitude, position.coords.longitude).then(
-          (hit) => {
-            setDraft(hit);
-            setLevel(3);
-            setLocating(false);
-          },
-        );
+        void applyPosition(position);
       },
       () => {
         // Denied, unavailable and timeout all land here: fall back to the cascade with a
@@ -138,7 +163,7 @@ export default function LocationSheet({ open, onOpenChange, onApply, autoFocusSe
       rememberRecent({ ...draft, label });
     }
     onApply(draft);
-    onOpenChange(false);
+    handleOpenChange(false);
   }
 
   const wards = WARDS.filter((ward) => {
@@ -157,7 +182,7 @@ export default function LocationSheet({ open, onOpenChange, onApply, autoFocusSe
   return (
     <BottomSheet
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={handleOpenChange}
       title={t('location.title')}
       heightClassName="h-[91dvh] max-h-[91dvh]"
       footer={
@@ -165,7 +190,7 @@ export default function LocationSheet({ open, onOpenChange, onApply, autoFocusSe
           type="button"
           onClick={apply}
           disabled={draft.area_id === undefined}
-          className="bg-primary text-primary-foreground disabled:bg-surface-2 disabled:text-ink-3 h-12 w-full rounded-[14px] text-sm font-bold"
+          className="h-12 w-full rounded-[14px] bg-primary text-sm font-bold text-primary-foreground disabled:bg-surface-2 disabled:text-ink-3"
         >
           {t('location.seePlaces')}
         </button>
@@ -176,7 +201,7 @@ export default function LocationSheet({ open, onOpenChange, onApply, autoFocusSe
           <span className="sr-only">{t('location.searchPlaceholder')}</span>
           <SearchIcon
             aria-hidden="true"
-            className="text-ink-2 pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2"
+            className="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-ink-2"
           />
           <input
             ref={searchRef}
@@ -186,29 +211,29 @@ export default function LocationSheet({ open, onOpenChange, onApply, autoFocusSe
               setTerm(event.target.value);
             }}
             placeholder={t('location.searchPlaceholder')}
-            className="bg-surface-2 placeholder:text-ink-2 h-[46px] w-full rounded-[14px] pr-3 pl-10"
+            className="h-[46px] w-full rounded-[14px] bg-surface-2 pr-3 pl-10 placeholder:text-ink-2"
           />
         </label>
-        <p className="text-ink-2 text-xs">{t('location.searchHint')}</p>
+        <p className="text-xs text-ink-2">{t('location.searchHint')}</p>
 
         <button
           type="button"
-          onClick={useCurrentLocation}
-          className="bg-tint text-tint-ink flex h-11 w-full items-center justify-center gap-2 rounded-[14px] text-sm font-semibold"
+          onClick={locateUser}
+          className="flex h-11 w-full items-center justify-center gap-2 rounded-[14px] bg-tint text-sm font-semibold text-tint-ink"
         >
           <LocateIcon aria-hidden="true" className="size-5" />
           {locating ? t('location.locating') : t('location.useCurrent')}
         </button>
         {locateError && (
-          <p role="alert" className="text-ink-2 text-xs">
+          <p role="alert" className="text-xs text-ink-2">
             {t('location.locateDenied')}
           </p>
         )}
 
         {recents.length > 0 && !searching && (
           <div>
-            <p className="text-ink-2 mb-2 text-xs font-semibold">{t('location.recent')}</p>
-            <ul className="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <p className="mb-2 text-xs font-semibold text-ink-2">{t('location.recent')}</p>
+            <ul className="flex [scrollbar-width:none] gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden">
               {recents.map((recent) => {
                 return (
                   <li key={recent.label} className="shrink-0">
@@ -222,9 +247,9 @@ export default function LocationSheet({ open, onOpenChange, onApply, autoFocusSe
                         });
                         setLevel(3);
                       }}
-                      className="rounded-chip border-line bg-surface flex h-11 items-center gap-1.5 border px-3.5 text-sm whitespace-nowrap"
+                      className="flex h-11 items-center gap-1.5 rounded-chip border border-line bg-surface px-3.5 text-sm whitespace-nowrap"
                     >
-                      <ClockIcon aria-hidden="true" className="text-ink-2 size-4" />
+                      <ClockIcon aria-hidden="true" className="size-4 text-ink-2" />
                       {recent.label}
                     </button>
                   </li>
@@ -236,7 +261,7 @@ export default function LocationSheet({ open, onOpenChange, onApply, autoFocusSe
       </div>
 
       {searching ? (
-        <ul className="border-line border-t">
+        <ul className="border-t border-line">
           {(hits.data ?? []).map((hit) => {
             if (hit.kind === 'area') {
               return (
@@ -246,10 +271,10 @@ export default function LocationSheet({ open, onOpenChange, onApply, autoFocusSe
                     onClick={() => {
                       selectArea(hit.area.id);
                     }}
-                    className="border-line flex min-h-14 w-full items-center justify-between gap-2 border-b px-4 py-2 text-left"
+                    className="flex min-h-14 w-full items-center justify-between gap-2 border-b border-line px-4 py-2 text-left"
                   >
                     <span className="text-sm font-semibold">{hit.area.name}</span>
-                    <ChevronRightIcon aria-hidden="true" className="text-ink-2 size-5 shrink-0" />
+                    <ChevronRightIcon aria-hidden="true" className="size-5 shrink-0 text-ink-2" />
                   </button>
                 </li>
               );
@@ -263,25 +288,25 @@ export default function LocationSheet({ open, onOpenChange, onApply, autoFocusSe
                     onClick={() => {
                       selectWard(hit.ward.id, hit.area.id);
                     }}
-                    className="border-line flex min-h-14 w-full items-center justify-between gap-2 border-b px-4 py-2 text-left"
+                    className="flex min-h-14 w-full items-center justify-between gap-2 border-b border-line px-4 py-2 text-left"
                   >
                     <span className="min-w-0">
                       <span className="flex items-center gap-2">
                         <span className="truncate text-sm font-semibold">{hit.ward.name}</span>
                         {/* The badge explains WHY an unfamiliar ward matched what was typed. */}
                         {hit.matched_old_name && (
-                          <span className="rounded-chip bg-open-tint text-open shrink-0 px-2 py-0.5 text-[11px] font-bold">
+                          <span className="shrink-0 rounded-chip bg-open-tint px-2 py-0.5 text-[11px] font-bold text-open">
                             {t('location.newNameBadge')}
                           </span>
                         )}
                       </span>
                       {hit.ward.old_name !== undefined && (
-                        <span className="text-ink-2 block truncate text-xs">
+                        <span className="block truncate text-xs text-ink-2">
                           {t('location.oldName', { name: hit.ward.old_name })} · {hit.area.name}
                         </span>
                       )}
                     </span>
-                    <ChevronRightIcon aria-hidden="true" className="text-ink-2 size-5 shrink-0" />
+                    <ChevronRightIcon aria-hidden="true" className="size-5 shrink-0 text-ink-2" />
                   </button>
                 </li>
               );
@@ -294,27 +319,27 @@ export default function LocationSheet({ open, onOpenChange, onApply, autoFocusSe
                   onClick={() => {
                     selectStreet(hit.street.id, hit.ward.id, hit.area.id);
                   }}
-                  className="border-line flex min-h-14 w-full items-center justify-between gap-2 border-b px-4 py-2 text-left"
+                  className="flex min-h-14 w-full items-center justify-between gap-2 border-b border-line px-4 py-2 text-left"
                 >
                   <span className="min-w-0">
                     <span className="block truncate text-sm font-semibold">{hit.street.name}</span>
-                    <span className="text-ink-2 block truncate text-xs">
+                    <span className="block truncate text-xs text-ink-2">
                       {hit.ward.name} · {hit.area.name}
                     </span>
                   </span>
-                  <ChevronRightIcon aria-hidden="true" className="text-ink-2 size-5 shrink-0" />
+                  <ChevronRightIcon aria-hidden="true" className="size-5 shrink-0 text-ink-2" />
                 </button>
               </li>
             );
           })}
           {hits.data !== undefined && hits.data.length === 0 && (
-            <li className="text-ink-2 px-4 py-6 text-center text-sm">{t('location.noMatches')}</li>
+            <li className="px-4 py-6 text-center text-sm text-ink-2">{t('location.noMatches')}</li>
           )}
         </ul>
       ) : (
         <>
           {draft.area_id !== undefined && (
-            <nav className="text-ink-2 flex items-center gap-1 px-4 pb-2 text-xs">
+            <nav className="flex items-center gap-1 px-4 pb-2 text-xs text-ink-2">
               {labelFor(draft)
                 .split(' › ')
                 .map((crumb, index) => {
@@ -336,7 +361,7 @@ export default function LocationSheet({ open, onOpenChange, onApply, autoFocusSe
             </nav>
           )}
 
-          <div role="tablist" className="border-line flex border-y">
+          <div role="tablist" className="flex border-y border-line">
             {tabs.map((tab) => {
               const active = level === tab.value;
 
@@ -371,7 +396,7 @@ export default function LocationSheet({ open, onOpenChange, onApply, autoFocusSe
             })}
           </div>
 
-          <p className="text-ink-2 px-4 py-2 text-xs">{t(`location.level${level}Hint`)}</p>
+          <p className="px-4 py-2 text-xs text-ink-2">{t(`location.level${level}Hint`)}</p>
 
           <ul>
             {level === 1 &&
@@ -386,22 +411,22 @@ export default function LocationSheet({ open, onOpenChange, onApply, autoFocusSe
                         selectArea(area.id);
                       }}
                       className={cn(
-                        'border-line flex min-h-14 w-full items-center justify-between gap-2 border-b px-4 py-2 text-left',
+                        'flex min-h-14 w-full items-center justify-between gap-2 border-b border-line px-4 py-2 text-left',
                         active && 'bg-tint',
                       )}
                     >
                       <span className="min-w-0">
                         <span className="block truncate text-sm font-semibold">{area.name}</span>
-                        <span className="text-ink-2 block truncate text-xs">
+                        <span className="block truncate text-xs text-ink-2">
                           {t('count.wards', { count: area.ward_count })}
                         </span>
                       </span>
                       {active ? (
-                        <CheckIcon aria-hidden="true" className="text-tint-ink size-5 shrink-0" />
+                        <CheckIcon aria-hidden="true" className="size-5 shrink-0 text-tint-ink" />
                       ) : (
                         <ChevronRightIcon
                           aria-hidden="true"
-                          className="text-ink-2 size-5 shrink-0"
+                          className="size-5 shrink-0 text-ink-2"
                         />
                       )}
                     </button>
@@ -421,24 +446,24 @@ export default function LocationSheet({ open, onOpenChange, onApply, autoFocusSe
                         selectWard(ward.id, ward.area_id);
                       }}
                       className={cn(
-                        'border-line flex min-h-14 w-full items-center justify-between gap-2 border-b px-4 py-2 text-left',
+                        'flex min-h-14 w-full items-center justify-between gap-2 border-b border-line px-4 py-2 text-left',
                         active && 'bg-tint',
                       )}
                     >
                       <span className="min-w-0">
                         <span className="block truncate text-sm font-semibold">{ward.name}</span>
                         {ward.old_name !== undefined && (
-                          <span className="text-ink-2 block truncate text-xs">
+                          <span className="block truncate text-xs text-ink-2">
                             {t('location.oldName', { name: ward.old_name })}
                           </span>
                         )}
                       </span>
                       {active ? (
-                        <CheckIcon aria-hidden="true" className="text-tint-ink size-5 shrink-0" />
+                        <CheckIcon aria-hidden="true" className="size-5 shrink-0 text-tint-ink" />
                       ) : (
                         <ChevronRightIcon
                           aria-hidden="true"
-                          className="text-ink-2 size-5 shrink-0"
+                          className="size-5 shrink-0 text-ink-2"
                         />
                       )}
                     </button>
@@ -458,13 +483,13 @@ export default function LocationSheet({ open, onOpenChange, onApply, autoFocusSe
                         selectStreet(street.id, street.ward_id, draft.area_id ?? '');
                       }}
                       className={cn(
-                        'border-line flex min-h-14 w-full items-center justify-between gap-2 border-b px-4 py-2 text-left',
+                        'flex min-h-14 w-full items-center justify-between gap-2 border-b border-line px-4 py-2 text-left',
                         active && 'bg-tint',
                       )}
                     >
                       <span className="truncate text-sm font-semibold">{street.name}</span>
                       {active && (
-                        <CheckIcon aria-hidden="true" className="text-tint-ink size-5 shrink-0" />
+                        <CheckIcon aria-hidden="true" className="size-5 shrink-0 text-tint-ink" />
                       )}
                     </button>
                   </li>

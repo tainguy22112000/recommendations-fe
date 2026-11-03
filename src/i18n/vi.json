@@ -122,7 +122,8 @@
     "directions": "Chỉ đường",
     "share": "Chia sẻ",
     "linkCopied": "Đã copy liên kết",
-    "notFound": "Không tìm thấy quán này"
+    "notFound": "Không tìm thấy quán này",
+    "shareFailed": "Không chia sẻ được liên kết"
   },
   "media": {
     "add": "Thêm ảnh",
@@ -190,5 +191,19 @@
     "40103": "Đăng nhập Google thất bại. Vui lòng thử lại.",
     "40302": "Tài khoản Google này không được phép đăng nhập.",
     "50002": "Lỗi máy chủ. Thử lại sau vài phút."
+  },
+  "login": {
+    "title": "Đăng nhập",
+    "subtitle": "Đăng nhập để tiếp tục.",
+    "google": "Đăng nhập bằng Google"
+  },
+  "notFound": {
+    "title": "Không tìm thấy trang",
+    "backHome": "Về trang chủ"
+  },
+  "onboarding": {
+    "title": "Chào mừng bạn!",
+    "accountCreated": "Tài khoản của bạn đã được tạo.",
+    "start": "Bắt đầu"
   }
 }

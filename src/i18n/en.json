@@ -122,7 +122,8 @@
     "directions": "Directions",
     "share": "Share",
     "linkCopied": "Link copied",
-    "notFound": "This place could not be found"
+    "notFound": "This place could not be found",
+    "shareFailed": "Couldn't share the link"
   },
   "media": {
     "add": "Add photos",
@@ -190,5 +191,19 @@
     "40103": "Google sign-in failed. Please try again.",
     "40302": "That Google account is not allowed to sign in here.",
     "50002": "A server error occurred. Try again in a few minutes."
+  },
+  "login": {
+    "title": "Sign in",
+    "subtitle": "Sign in to continue.",
+    "google": "Sign in with Google"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "backHome": "Back to home"
+  },
+  "onboarding": {
+    "title": "Welcome!",
+    "accountCreated": "Your account has been created.",
+    "start": "Get started"
   }
 }

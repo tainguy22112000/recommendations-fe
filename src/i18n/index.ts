@@ -1,7 +1,7 @@
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-import { Locale } from '@/lib/format';
+import type { Locale } from '@/lib/format';
 import en from './en.json';
 import vi from './vi.json';
 

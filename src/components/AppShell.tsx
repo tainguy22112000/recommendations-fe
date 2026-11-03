@@ -8,7 +8,7 @@ import BottomNav from './BottomNav';
 // scroll container refuses to shrink and pushes the nav off-screen.
 export default function AppShell() {
   return (
-    <div className="bg-background flex min-h-dvh flex-col">
+    <div className="flex min-h-dvh flex-col bg-background">
       <div className="mx-auto flex min-h-0 w-full max-w-[480px] flex-1 flex-col">
         <Outlet />
       </div>

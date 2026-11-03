@@ -174,3 +174,33 @@ export default [
 ```
 
 Note: the linter allows any expression-bodied callback for these methods. Rule 2's "one line, no side effects" conditions are checked during code review.
+
+## 7. Type safety
+
+These override the shared rules in `~/.claude/rules` where they conflict. `[lint]` is enforced by
+`pnpm lint`; the rest is checked in review.
+
+- `[lint]` No `any`. Use `unknown` and narrow it.
+- `[lint]` No non-null assertions (`!`). Handle the missing case.
+- Narrow with type guards rather than `as`. `JSON.parse` returns untrusted data, so validate it:
+
+  ```ts
+  const isStringArray = (value: unknown): value is string[] => {
+    return Array.isArray(value) && value.every((item) => typeof item === 'string');
+  };
+  ```
+
+- `as const` is fine, and so is `as` where a library's types leave no alternative, with a comment
+  saying why.
+- No `enum`. Use a union of literals, or an `as const` object when the values are needed at runtime.
+- `[lint]` Exported functions in `.ts` files declare their return type. Components and local values
+  infer.
+- Exhaustive switches end in a `never` check, so a new union member fails the typecheck.
+
+## 8. Imports and naming
+
+- `[lint]` Types are imported with `import type`.
+- `[lint]` No `I` or `T` prefixes: `Place`, `SortKey`, not `IPlace`, `TSortKey`.
+- `interface` for object shapes, `type` for unions, tuples and mapped types.
+- `snake_case` only for fields that cross the wire. Props, local state and store internals are
+  `camelCase`.

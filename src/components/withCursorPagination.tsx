@@ -1,8 +1,8 @@
-import { ComponentType } from 'react';
-import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
+import type { ComponentType } from 'react';
+import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
 
 import { useScrollSentinel } from '@/hooks/useScrollSentinel';
-import { ICursorResponse } from '@/types/api';
+import type { CursorResponse } from '@/types/api';
 
 /** Injected into the wrapped component. */
 export interface CursorPaginationProps<T> {
@@ -18,7 +18,7 @@ export interface CursorPaginationProps<T> {
   retry: () => void;
 }
 
-type PaginatedQuery<T> = UseInfiniteQueryResult<InfiniteData<ICursorResponse<T>>>;
+type PaginatedQuery<T> = UseInfiniteQueryResult<InfiniteData<CursorResponse<T>>>;
 
 /**
  * Gives a list component cursor-based scroll-to-fetch.
@@ -26,7 +26,7 @@ type PaginatedQuery<T> = UseInfiniteQueryResult<InfiniteData<ICursorResponse<T>>
  * Takes the infinite-query hook rather than a fetcher so the caller keeps control of the
  * cache key, and so the hook can read other state (the search store, route params) itself.
  *
- *   const Results = withCursorPagination<IPlace, OwnProps>(
+ *   const Results = withCursorPagination<Place, OwnProps>(
  *     () => usePlaces(useSearch().query),
  *   )(ResultsView);
  */

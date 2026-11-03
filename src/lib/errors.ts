@@ -1,5 +1,6 @@
 import { i18next } from '@/i18n';
-import { ERROR_CODE, ErrorCode, LOGIN_ERROR, LoginErrorCode } from '@/types/errors';
+import type { ErrorCode, LoginErrorCode } from '@/types/errors';
+import { ERROR_CODE, LOGIN_ERROR } from '@/types/errors';
 
 export class ApiRequestError extends Error {
   constructor(

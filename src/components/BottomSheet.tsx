@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
 import { CloseIcon } from '@/lib/icons';
@@ -37,7 +37,7 @@ export default function BottomSheet({
         className={cn('mx-auto max-w-[480px] md:max-w-[480px]', heightClassName)}
         aria-modal="true"
       >
-        <div className="border-line flex items-center gap-2 border-b px-4 py-3">
+        <div className="flex items-center gap-2 border-b border-line px-4 py-3">
           <DrawerTitle className="flex-1 truncate text-base font-bold">{title}</DrawerTitle>
           {titleAside}
           <button
@@ -46,7 +46,7 @@ export default function BottomSheet({
             onClick={() => {
               onOpenChange(false);
             }}
-            className="text-ink -mr-2 grid size-11 shrink-0 place-items-center rounded-full"
+            className="-mr-2 grid size-11 shrink-0 place-items-center rounded-full text-ink"
           >
             <CloseIcon aria-hidden="true" className="size-5" />
           </button>
@@ -55,39 +55,11 @@ export default function BottomSheet({
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">{children}</div>
 
         {footer !== undefined && (
-          <div
-            className="border-line bg-surface border-t px-4 pt-3"
-            style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
-          >
+          <div className="border-t border-line bg-surface px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
             {footer}
           </div>
         )}
       </DrawerContent>
     </Drawer>
-  );
-}
-
-/** Shared chip used across the filter and location sheets. */
-export function SheetChip({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      className={cn(
-        'rounded-chip flex h-11 items-center gap-1.5 border px-3.5 text-sm font-medium',
-        active ? 'border-primary bg-tint text-tint-ink' : 'border-line bg-surface text-ink',
-      )}
-    >
-      {children}
-    </button>
   );
 }

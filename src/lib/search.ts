@@ -1,4 +1,4 @@
-import {
+import type {
   Category,
   MinRating,
   PriceLevel,
@@ -154,60 +154,60 @@ export const QUICK_FILTERS: QuickFilter[] = [
   {
     id: 'open_now',
     labelKey: 'quick.openNow',
-    isActive: (query) => {
+    isActive: (query: SearchQuery): boolean => {
       return query.filters.open_now;
     },
-    toggle: (query) => {
+    toggle: (query: SearchQuery): SearchQuery => {
       return withFilters(query, { open_now: !query.filters.open_now });
     },
   },
   {
     id: 'cheap',
     labelKey: 'quick.cheap',
-    isActive: (query) => {
+    isActive: (query: SearchQuery): boolean => {
       return query.filters.price_levels.includes(1);
     },
-    toggle: (query) => {
+    toggle: (query: SearchQuery): SearchQuery => {
       return withPriceLevel(query, 1);
     },
   },
   {
     id: 'aircon',
     labelKey: 'quick.aircon',
-    isActive: (query) => {
+    isActive: (query: SearchQuery): boolean => {
       return query.filters.tag_keys.includes('aircon');
     },
-    toggle: (query) => {
+    toggle: (query: SearchQuery): SearchQuery => {
       return withTag(query, 'aircon');
     },
   },
   {
     id: 'work',
     labelKey: 'quick.work',
-    isActive: (query) => {
+    isActive: (query: SearchQuery): boolean => {
       return query.filters.tag_keys.includes('work');
     },
-    toggle: (query) => {
+    toggle: (query: SearchQuery): SearchQuery => {
       return withTag(query, 'work');
     },
   },
   {
     id: 'parking',
     labelKey: 'quick.parking',
-    isActive: (query) => {
+    isActive: (query: SearchQuery): boolean => {
       return query.filters.tag_keys.includes('parking');
     },
-    toggle: (query) => {
+    toggle: (query: SearchQuery): SearchQuery => {
       return withTag(query, 'parking');
     },
   },
   {
     id: 'rating45',
     labelKey: 'quick.rating45',
-    isActive: (query) => {
+    isActive: (query: SearchQuery): boolean => {
       return query.filters.min_rating === 4.5;
     },
-    toggle: (query) => {
+    toggle: (query: SearchQuery): SearchQuery => {
       return withMinRating(query, 4.5);
     },
   },

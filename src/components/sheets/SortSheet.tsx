@@ -34,7 +34,7 @@ export default function SortSheet({ open, onOpenChange }: Props) {
                 }}
                 className={cn(
                   'flex h-[52px] w-full items-center justify-between px-4 text-sm',
-                  active ? 'bg-tint text-tint-ink font-semibold' : 'text-ink',
+                  active ? 'bg-tint font-semibold text-tint-ink' : 'text-ink',
                 )}
               >
                 {t(SORT_LABEL_KEYS[key])}

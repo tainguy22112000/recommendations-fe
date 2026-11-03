@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
-import BottomSheet, { SheetChip } from '@/components/BottomSheet';
+import BottomSheet from '@/components/BottomSheet';
+import SheetChip from '@/components/SheetChip';
 import { usePlaceCount } from '@/hooks/usePlaces';
 import { CheckIcon } from '@/lib/icons';
 import {
@@ -31,7 +32,7 @@ interface Props {
 
 function Section({ legend, children }: { legend: string; children: React.ReactNode }) {
   return (
-    <fieldset className="border-line border-b px-4 py-4 last:border-b-0">
+    <fieldset className="border-b border-line px-4 py-4 last:border-b-0">
       <legend className="mb-3 text-sm font-bold">{legend}</legend>
       {children}
     </fieldset>
@@ -58,7 +59,7 @@ export default function FilterSheet({ open, onOpenChange }: Props) {
       heightClassName="h-[90dvh] max-h-[90dvh]"
       titleAside={
         activeCount > 0 ? (
-          <span className="text-primary shrink-0 text-sm font-semibold">
+          <span className="shrink-0 text-sm font-semibold text-primary">
             {t('count.selected', { count: activeCount })}
           </span>
         ) : undefined
@@ -70,7 +71,7 @@ export default function FilterSheet({ open, onOpenChange }: Props) {
             onClick={() => {
               update(clearFilters);
             }}
-            className="border-line h-12 shrink-0 rounded-[14px] border px-4 text-sm font-semibold"
+            className="h-12 shrink-0 rounded-[14px] border border-line px-4 text-sm font-semibold"
           >
             {t('empty.clearAll')}
           </button>
@@ -80,7 +81,7 @@ export default function FilterSheet({ open, onOpenChange }: Props) {
             onClick={() => {
               onOpenChange(false);
             }}
-            className="bg-primary text-primary-foreground disabled:bg-surface-2 disabled:text-ink-3 h-12 flex-1 rounded-[14px] text-sm font-bold"
+            className="h-12 flex-1 rounded-[14px] bg-primary text-sm font-bold text-primary-foreground disabled:bg-surface-2 disabled:text-ink-3"
           >
             {count.data === undefined
               ? t('common.loading')
@@ -137,7 +138,7 @@ export default function FilterSheet({ open, onOpenChange }: Props) {
                 >
                   {/* Dish names stay Vietnamese; EN appends a gloss. */}
                   {t(`cuisine.${key}`)}
-                  {hint !== '' && <span className="text-ink-2 text-xs">· {hint}</span>}
+                  {hint !== '' && <span className="text-xs text-ink-2">· {hint}</span>}
                 </SheetChip>
               );
             })}
