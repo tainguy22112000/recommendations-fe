@@ -8,12 +8,14 @@ import FilterSheet from '@/components/sheets/FilterSheet';
 import LocationSheet from '@/components/sheets/LocationSheet';
 import SortSheet from '@/components/sheets/SortSheet';
 import { clearFilters, withFilters, withLocation } from '@/lib/search';
-import { useSearch } from '@/store/search-store';
+import { useSearchStore } from '@/store/search-store';
 
 type Sheet = 'filter' | 'sort' | 'location' | null;
 
 export default function DiscoverPage() {
-  const { update } = useSearch();
+  const update = useSearchStore((state) => {
+    return state.update;
+  });
   const [sheet, setSheet] = useState<Sheet>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());

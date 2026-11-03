@@ -29,6 +29,7 @@
   --color-open-tint: var(--open-tint);
   --color-star: var(--star);
   --color-skel: var(--skel);
+  --color-viewer: var(--viewer);
   --radius-chip: 999px;
   --radius-card: 16px;
   --radius-sheet: 22px;
@@ -95,6 +96,8 @@
   --star: #c27a12;
   --scrim: rgba(28, 18, 12, 0.48);
   --skel: #ede3d9;
+  /* Same in both themes: the media viewer stays near-black so photos read true. */
+  --viewer: #0f0b09;
 
   /* shadcn/ui semantics mapped onto the palette. The docs' --on-primary is
        --primary-foreground here, which is the name the primitives already use. */
