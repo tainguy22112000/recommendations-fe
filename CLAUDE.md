@@ -35,8 +35,9 @@ and `04` are present:
 - `02-component-breakdown.md` — component tree, props, state ownership, **i18n keys**.
   Phase 1 says to take the VI/EN copy from it. Until it lands, i18n keys are invented at the
   call site and must be reconciled later.
-- `03-database-analysis.md` — entities, schema, **the API contract**. The `IPlace` /
-  `SearchQuery` types in `01` are the only contract we have; everything else is mocked.
+- `03-database-analysis.md` — entities, schema, **the API contract**. The `IPlace` (`Place` in
+  `src/types`) / `SearchQuery` types in `01` are the only contract we have. Everything beyond them
+  is an assumption. Reverse-geocoding and the area, ward and street lists are still mocked.
 
 Do not invent an API contract and present it as settled. Mock it, keep mocks in one place,
 and mark the boundary.
@@ -47,30 +48,31 @@ The docs describe a greenfield stack; this repo already has a committed, working
 docs' `[STACK]` block says _"Replace the `[STACK]` block if you use a different stack"_, so
 the installed library wins on every row below. The **design intent** of each doc row is kept.
 
-| Concern   | Docs say                    | We use (installed)                 | How intent is preserved                                                           |
-| --------- | --------------------------- | ---------------------------------- | --------------------------------------------------------------------------------- |
-| React     | 18                          | **19.3**                           | No API in the docs needs 18                                                       |
-| UI        | no UI kit, CSS Modules      | **shadcn/ui (radix-nova) + TW 4**  | Retokenise the primitives to the palette below                                    |
-| App state | Zustand                     | **Zustand** (`store/search-store`) | Matches the docs; server state still lives in TanStack Query                      |
-| Theming   | `data-theme="dark"` on html | **next-themes** writing `.dark`    | Same tokens, different attribute; see §Theming                                    |
-| Font      | Be Vietnam Pro              | **Geist** (`@fontsource-variable`) | Swap to Be Vietnam Pro when VI diacritics are reviewed — it is the better VI face |
-| Icons     | inline stroke SVG, 24px     | **lucide-react**                   | Lucide is 24px stroke; matches. **No emoji in UI** either way                     |
-| Map (R2)  | MapLibre GL / Google Maps   | not installed                      | Decide at R2; lazy-load as its own chunk                                          |
-| PWA (R2)  | `vite-plugin-pwa`           | not installed                      | Add at R2, not before                                                             |
-| i18n      | `i18next`, vi + en          | **i18next + react-i18next**        | Installed in phase 1; `en.ts` is typed against `vi.ts`                            |
+| Concern   | Docs say                    | We use (installed)                 | How intent is preserved                                            |
+| --------- | --------------------------- | ---------------------------------- | ------------------------------------------------------------------ |
+| React     | 18                          | **19.3**                           | No API in the docs needs 18                                        |
+| UI        | no UI kit, CSS Modules      | **shadcn/ui (radix-nova) + TW 4**  | Retokenise the primitives to the palette below                     |
+| App state | Zustand                     | **Zustand** (`store/search-store`) | Matches the docs; server state still lives in TanStack Query       |
+| Theming   | `data-theme="dark"` on html | **next-themes** writing `.dark`    | Same tokens, different attribute; see §Theming                     |
+| Font      | Be Vietnam Pro              | **Be Vietnam Pro** (`@fontsource`) | Matches the docs; static weights, subsets gated by `unicode-range` |
+| Icons     | inline stroke SVG, 24px     | **lucide-react**                   | Lucide is 24px stroke; matches. **No emoji in UI** either way      |
+| Map (R2)  | MapLibre GL / Google Maps   | not installed                      | Decide at R2; lazy-load as its own chunk                           |
+| PWA (R2)  | `vite-plugin-pwa`           | not installed                      | Add at R2, not before                                              |
+| i18n      | `i18next`, vi + en          | **i18next + react-i18next**        | Installed in phase 1; `en.json` is typed against `vi.json`         |
 
 Unresolved and deliberately so: the **map SDK choice**. Cheap to defer; it does not block R1.
 
 ## Stack & libraries
 
-- React 19 + Vite + TypeScript (strict)
+- React 19 + Vite + TypeScript (strict), pinned to **6.0.x**: `typescript-eslint` requires `<6.1.0`.
+  Move back to 7 once its peer range allows it
 - `react-router-dom` v7 (data router: `createBrowserRouter` + `RouterProvider`)
 - `@tanstack/react-query` — all **server** state
 - `zustand` — the one piece of global **client** state (`SearchQuery`)
 - `axios` (shared instance with the auth/CSRF interceptor)
 - `tailwindcss` v4 (CSS-first; no `tailwind.config.ts`) + shadcn/ui (style `radix-nova`)
 - `next-themes` (theme class), `sonner` (toasts), `vaul` (drawers → bottom sheets)
-- `i18next` + `react-i18next` — VI default, EN peer; `i18n/en.ts` is typed against `vi.ts`
+- `i18next` + `react-i18next` — VI default, EN peer; `i18n/en.json` is typed against `vi.json`
   so a missing translation is a compile error
 
 ## Commands
@@ -81,6 +83,10 @@ pnpm dev           # http://localhost:5173 (API on :9999)
 pnpm build         # tsc -b (type gate) then vite build → dist/
 pnpm typecheck
 pnpm test          # vitest (format/normalize helpers must be covered)
+pnpm lint          # eslint, zero warnings allowed
+pnpm lint:fix
+pnpm format        # prettier + Tailwind class sorting
+pnpm format:check
 ```
 
 ## Routes
@@ -195,9 +201,9 @@ const LOGIN_ERROR = {
 };
 ```
 
-Copy lives under `apiError.<code>` and `loginError.<code>` in `i18n/{vi,en}.ts`, with the
-constant's name in a trailing comment — `40101` alone tells a translator nothing. `en.ts` is
-typed against `vi.ts`, so a code with no translation fails `pnpm typecheck`.
+Copy lives under `apiError.<code>` and `loginError.<code>` in `i18n/{vi,en}.json`. JSON has no
+comments, so this section is what maps a number to its constant — `40101` alone tells a translator
+nothing. `en.json` is typed against `vi.json`, so a code with no translation fails `pnpm typecheck`.
 
 Rules:
 
@@ -267,8 +273,7 @@ pnpm build && gzip -c dist/assets/index-*.js | wc -c
 Lazy-load the map SDK (R2) and the lucky spin (R3) as separate chunks. Images via `srcset` +
 WebP/AVIF with blurhash placeholders.
 
-⚠️ The current build is **183 KB gzipped** — already over the 170 KB budget before any
-product code exists. Trim before adding the map or spin chunks.
+⚠️ The current build is **208 KB gzipped** (measured 2026-11-03) — over the 170 KB budget. Trim before adding the map or spin chunks.
 
 ## Data contracts
 
@@ -285,7 +290,7 @@ Mock these first; the real API is specified in the missing `03-database-analysis
 ```ts
 type Category = 'food' | 'cafe';
 
-interface IPlace {
+interface Place {
   id: string;
   name: string;
   category: Category;
@@ -343,13 +348,17 @@ interface CursorPage<T> {
   total: number | null; // null when the backend declines to count
 }
 
-interface ICursorParams {
+interface CursorParams {
   cursor?: string;
   limit?: number;
 }
 
-type PlaceCursorPage = CursorPage<IPlace>;
+type PlaceCursorPage = CursorPage<Place>;
 ```
+
+⚠️ `src/types` has drifted from this block: the code has `CursorResponse` with an optional
+`next_cursor` and a required `limit` where this says `CursorPage`, and `open_now` / `open_late` /
+`open_24h` where this says camelCase. `src/types` is what runs; reconcile when the API contract lands.
 
 **The cursor is not part of `SearchQuery`.** The doc's contract lists it there, but it is
 pagination state, not search state: folding it into the TanStack Query key would give every
@@ -421,7 +430,7 @@ rules that still bind:
   bounced from a page lands on `/`. `RequireAuth` still records the path in
   `location.state.from`, so re-enabling means re-adding the parameter on both sides.
 - Session: 12h absolute + 30m idle, sliding. Nothing to refresh, no client-side timer.
-- All requests go through `api/client.ts`. No direct `fetch`/`axios` in components.
+- All requests go through `src/api/`. No direct `fetch`/`axios` elsewhere (enforced by lint).
 
 ## Rules for humans / AI writing frontend code
 
@@ -437,37 +446,36 @@ rules that still bind:
 - `components/ui/` is owned by the shadcn CLI and may be overwritten — override at the call
   site, don't edit in place. Retokenising to the palette above is the one allowed exception.
 - A change to the data contracts above → update `src/types/` in the same commit.
-- Follow `.claude/rules/typescript.md` (explicit `return`, block bodies) and
-  `.claude/rules/commit.md` (never commit unless asked).
-- Comments: sparingly, only where the logic isn't self-evident. Prefer clear names.
+- Follow `.claude/rules/`: `typescript`, `javascript`, `react`, `shadcn`, `clean-code`,
+  `code-comments`, `commit` (never commit unless asked). Where marked `[lint]`, `pnpm lint` enforces them.
 
 ## Implementation checklist
 
 Done (auth era, committed):
 
 - [x] Vite + Tailwind 4 + Router + Query scaffold, `host: true`
-- [x] 15 shadcn/ui `radix-nova` primitives, Geist font, theme wiring
-- [x] Cookie-session auth: `api/{axios,client,endpoints,auth}.ts`, `lib/{csrf,errors,navigate}.ts`
-- [x] LoginPage, RequireAuth, sign out, AppHeader/AppLayout, HomePage
-- [x] `viewport-fit=cover`, 44px touch targets, dark mode via `prefers-color-scheme`
+- [x] 15 shadcn/ui `radix-nova` primitives, Be Vietnam Pro, theme wiring
+- [x] Cookie-session auth: `api/{axios,baseCursorAPI,endpoints,authAPI}.ts`, `lib/{csrf,errors,navigate}.ts`
+- [x] LoginPage, RequireAuth. `useLogout` is ready, but no screen shows sign-out until R2 Account:
+      the old `AppHeader` had the only button (see git history)
+- [x] `viewport-fit=cover`, 44px touch targets, dark mode via `next-themes`
 
 Blocked / needs input:
 
 - [ ] **`02-component-breakdown.md` missing** — i18n keys and component props undefined
 - [ ] **`03-database-analysis.md` missing** — no real API contract; everything is mocked
-- [ ] Decide Be Vietnam Pro vs Geist (VI diacritic review)
 - [ ] Decide the map SDK (R2)
 
-R1, not started:
+R1:
 
-- [ ] Phase 1 — tokens, i18next, `lib/format.ts` + `lib/normalize.ts` with tests, icon set
-- [ ] Phase 2 — AppShell + BottomNav, routes, R1 nav items disabled
-- [ ] Phase 3 — Discover header, toolbar, PlaceCard list, infinite scroll
-- [ ] Phase 4 — `searchStore` (`SearchQuery`), FilterSheet with live count, SortSheet
-- [ ] Phase 5 — Location sheet: 3-level cascade + old-ward-name search
-- [ ] Phase 7 — Place detail + media grid (viewer is R2)
+- [x] Phase 1 — tokens, i18next, `lib/format.ts` + `lib/normalize.ts` with tests, icon set
+- [x] Phase 2 — AppShell + BottomNav, routes, R1 nav items disabled
+- [x] Phase 3 — Discover header, toolbar, PlaceCard list, infinite scroll
+- [x] Phase 4 — `searchStore` (`SearchQuery`), FilterSheet with live count, SortSheet
+- [x] Phase 5 — Location sheet: 3-level cascade + old-ward-name search
+- [x] Phase 7 — Place detail + media grid (viewer is R2)
 - [ ] Phase 10a — EmptyState, LoadingState, QA checklist
 - [ ] Retokenise `components/ui/` to the terracotta palette
-- [ ] Trim initial JS from 183 KB to under the 170 KB budget
+- [ ] Trim initial JS from 208 KB to under the 170 KB budget
 - [ ] Check every screen at 360/375/390/430px, VI and EN, light and dark
 - [ ] Real-device QA: iOS Safari (latest, latest-1), mid-range Android Chrome, 4G throttling
