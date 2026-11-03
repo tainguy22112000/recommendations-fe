@@ -1,10 +1,11 @@
 import { useTranslation } from 'react-i18next';
 
 import { EmptyState, ErrorState, LoadingState } from '@/components/ListStates';
-import { CursorPaginationProps, withCursorPagination } from '@/components/withCursorPagination';
+import type { CursorPaginationProps } from '@/components/withCursorPagination';
+import { withCursorPagination } from '@/components/withCursorPagination';
 import { usePlaces } from '@/hooks/usePlaces';
 import { useSearch } from '@/store/search-store';
-import { IPlace } from '@/types/place';
+import type { Place } from '@/types/place';
 import PlaceCard, { PlaceCardSkeleton } from './PlaceCard';
 import ResultCountBar from './ResultCountBar';
 
@@ -28,7 +29,7 @@ function PlaceResultsView({
   onClearAll,
   sentinelRef,
   retry,
-}: OwnProps & CursorPaginationProps<IPlace>) {
+}: OwnProps & CursorPaginationProps<Place>) {
   const { t } = useTranslation();
 
   if (isPending) {
@@ -65,19 +66,19 @@ function PlaceResultsView({
         {isFetchingMore && (
           <li>
             <PlaceCardSkeleton />
-            <p className="text-ink-2 pt-3 text-center text-sm">{t('discover.loadingMore')}</p>
+            <p className="pt-3 text-center text-sm text-ink-2">{t('discover.loadingMore')}</p>
           </li>
         )}
 
         {!hasMore && (
-          <li className="text-ink-2 pb-2 text-center text-sm">{t('discover.endOfList')}</li>
+          <li className="pb-2 text-center text-sm text-ink-2">{t('discover.endOfList')}</li>
         )}
       </ul>
     </>
   );
 }
 
-const PlaceResults = withCursorPagination<IPlace, OwnProps>(() => {
+const PlaceResults = withCursorPagination<Place, OwnProps>(() => {
   const { query } = useSearch();
 
   return usePlaces(query);

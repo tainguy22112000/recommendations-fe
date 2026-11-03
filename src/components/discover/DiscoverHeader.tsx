@@ -6,7 +6,7 @@ import { ChevronDownIcon, PinIcon, SearchIcon } from '@/lib/icons';
 import { withCategory, withSearchTerm } from '@/lib/search';
 import { useSearch } from '@/store/search-store';
 import { cn } from 'cn';
-import { Category } from '@/types/place';
+import type { Category } from '@/types/place';
 
 const CATEGORIES: { value: 'all' | Category; labelKey: string }[] = [
   { value: 'all', labelKey: 'discover.categoryAll' },
@@ -42,14 +42,14 @@ export default function DiscoverHeader({ onOpenLocation, collapsed }: Props) {
               type="button"
               onClick={onOpenLocation}
               aria-label={t('a11y.openLocation')}
-              className="rounded-chip bg-surface border-line flex h-11 min-w-0 flex-1 items-center gap-1.5 border px-3"
+              className="flex h-11 min-w-0 flex-1 items-center gap-1.5 rounded-chip border border-line bg-surface px-3"
             >
-              <PinIcon aria-hidden="true" className="text-primary size-5 shrink-0" />
+              <PinIcon aria-hidden="true" className="size-5 shrink-0 text-primary" />
               <span className="truncate text-sm font-semibold">{locationLabel}</span>
-              <ChevronDownIcon aria-hidden="true" className="text-ink-2 size-4 shrink-0" />
+              <ChevronDownIcon aria-hidden="true" className="size-4 shrink-0 text-ink-2" />
             </button>
 
-            <div className="rounded-chip bg-surface-2 flex h-11 shrink-0 items-center p-1">
+            <div className="flex h-11 shrink-0 items-center rounded-chip bg-surface-2 p-1">
               {(['vi', 'en'] as const).map((value) => {
                 return (
                   <button
@@ -60,7 +60,7 @@ export default function DiscoverHeader({ onOpenLocation, collapsed }: Props) {
                       setLocale(value);
                     }}
                     className={cn(
-                      'rounded-chip h-9 px-3 text-sm font-bold uppercase',
+                      'h-9 rounded-chip px-3 text-sm font-bold uppercase',
                       locale === value ? 'bg-ink text-background' : 'text-ink-2',
                     )}
                   >
@@ -75,7 +75,7 @@ export default function DiscoverHeader({ onOpenLocation, collapsed }: Props) {
             <span className="sr-only">{t('discover.searchPlaceholder')}</span>
             <SearchIcon
               aria-hidden="true"
-              className="text-ink-2 pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2"
+              className="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-ink-2"
             />
             <input
               type="search"
@@ -86,13 +86,13 @@ export default function DiscoverHeader({ onOpenLocation, collapsed }: Props) {
                 });
               }}
               placeholder={t('discover.searchPlaceholder')}
-              className="bg-surface-2 placeholder:text-ink-2 h-[46px] w-full rounded-[14px] pr-3 pl-10"
+              className="h-[46px] w-full rounded-[14px] bg-surface-2 pr-3 pl-10 placeholder:text-ink-2"
             />
           </label>
         </div>
       </div>
 
-      <div role="tablist" className="rounded-chip bg-surface-2 mb-3 flex h-11 items-center p-1">
+      <div role="tablist" className="mb-3 flex h-11 items-center rounded-chip bg-surface-2 p-1">
         {CATEGORIES.map(({ value, labelKey }) => {
           const active = query.category === value;
 
@@ -108,7 +108,7 @@ export default function DiscoverHeader({ onOpenLocation, collapsed }: Props) {
                 });
               }}
               className={cn(
-                'rounded-chip h-9 flex-1 text-sm font-semibold',
+                'h-9 flex-1 rounded-chip text-sm font-semibold',
                 active ? 'bg-surface text-ink shadow-segment' : 'text-ink-2',
               )}
             >

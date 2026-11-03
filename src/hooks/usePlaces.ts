@@ -1,12 +1,7 @@
-import {
-  InfiniteData,
-  UseInfiniteQueryResult,
-  UseQueryResult,
-  useInfiniteQuery,
-  useQuery,
-} from '@tanstack/react-query';
+import type { InfiniteData, UseInfiniteQueryResult, UseQueryResult } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { PlaceAPI } from '@/api/placesAPI';
-import { LocationHit, PlaceDetail, PlaceCursorPage, SearchQuery } from '@/types/place';
+import type { LocationHit, PlaceDetail, PlaceCursorPage, SearchQuery } from '@/types/place';
 import { useDebouncedValue } from './useDebouncedValue';
 
 export function usePlaces(

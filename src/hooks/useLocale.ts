@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import { Locale } from '@/lib/format';
+import type { Locale } from '@/lib/format';
 
 export function useLocale(): Locale {
   const { i18n } = useTranslation();

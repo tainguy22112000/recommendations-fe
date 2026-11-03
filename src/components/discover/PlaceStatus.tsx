@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { useLocale } from '@/hooks/useLocale';
 import { formatTime } from '@/lib/format';
 import { cn } from 'cn';
-import { IPlace } from '@/types/place';
+import type { Place } from '@/types/place';
 
 interface Props {
-  place: Pick<IPlace, 'is_open' | 'is_24h' | 'closes_at' | 'opens_at'>;
+  place: Pick<Place, 'is_open' | 'is_24h' | 'closes_at' | 'opens_at'>;
   className?: string;
 }
 

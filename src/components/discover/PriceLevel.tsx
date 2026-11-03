@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { PriceLevel as Level } from '@/types/place';
+import type { PriceLevel as Level } from '@/types/place';
 
 type Props = {
   level: Level;

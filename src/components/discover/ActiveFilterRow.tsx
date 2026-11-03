@@ -14,7 +14,7 @@ export default function ActiveFilterRow() {
   }
 
   return (
-    <ul className="flex gap-2 overflow-x-auto px-4 pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <ul className="flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 pt-3 [&::-webkit-scrollbar]:hidden">
       {chips.map((chip) => {
         const label = t(chip.labelKey, chip.params);
 
@@ -26,7 +26,7 @@ export default function ActiveFilterRow() {
               onClick={() => {
                 update(chip.remove);
               }}
-              className="rounded-chip bg-ink text-background flex h-11 items-center gap-1.5 px-3.5 text-sm font-medium whitespace-nowrap"
+              className="flex h-11 items-center gap-1.5 rounded-chip bg-ink px-3.5 text-sm font-medium whitespace-nowrap text-background"
             >
               {label}
               <CloseIcon aria-hidden="true" className="size-4" />
@@ -40,7 +40,7 @@ export default function ActiveFilterRow() {
           onClick={() => {
             update(clearFilters);
           }}
-          className="text-primary flex h-11 items-center px-2 text-sm font-semibold underline"
+          className="flex h-11 items-center px-2 text-sm font-semibold text-primary underline"
         >
           {t('discover.clearAll')}
         </button>

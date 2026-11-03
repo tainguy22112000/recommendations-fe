@@ -1,5 +1,5 @@
-import { ICursorParams } from '@/types/api';
-import { IPlace, LocationHit, PlaceCursorPage, PlaceDetail, SearchQuery } from '@/types/place';
+import type { CursorParams } from '@/types/api';
+import type { Place, LocationHit, PlaceCursorPage, PlaceDetail, SearchQuery } from '@/types/place';
 import { queryNearest } from '@/mocks/places';
 import { BaseCursorAPI } from './baseCursorAPI';
 import { ENDPOINTS } from './endpoints';
@@ -37,8 +37,8 @@ function serializeQuery(query: SearchQuery): Record<string, unknown> {
 
 class BasePlaceAPI extends BaseCursorAPI {
   /** One page of results. The cursor is a pagination param, never part of the query. */
-  public getPlaces(query: SearchQuery, params: ICursorParams = {}): Promise<PlaceCursorPage> {
-    return this.getList<IPlace>(ENDPOINTS.PLACES, {
+  public getPlaces(query: SearchQuery, params: CursorParams = {}): Promise<PlaceCursorPage> {
+    return this.getList<Place>(ENDPOINTS.PLACES, {
       ...serializeQuery(query),
       cursor: params.cursor,
       limit: params.limit,
@@ -61,8 +61,8 @@ class BasePlaceAPI extends BaseCursorAPI {
 
   // No screen calls these yet and no endpoint is documented for them — the REST shape below
   // is the assumption, not a settled contract.
-  public updatePlaceByID(id: string, updates: Partial<IPlace>): Promise<IPlace> {
-    return this.patch<IPlace>(`${ENDPOINTS.PLACES}/${id}`, updates);
+  public updatePlaceByID(id: string, updates: Partial<Place>): Promise<Place> {
+    return this.patch<Place>(`${ENDPOINTS.PLACES}/${id}`, updates);
   }
 
   public deletePlaceByID(id: string): Promise<void> {

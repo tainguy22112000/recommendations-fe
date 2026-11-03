@@ -16,7 +16,11 @@ interface Options {
  * node automatically. An object ref inside an effect would need the whole query object in
  * its dependencies and would rebuild the observer on every render.
  */
-export function useScrollSentinel({ onReachEnd, enabled, rootMargin = '240px' }: Options) {
+export function useScrollSentinel({
+  onReachEnd,
+  enabled,
+  rootMargin = '240px',
+}: Options): (node: HTMLElement | null) => void {
   const observer = useRef<IntersectionObserver | null>(null);
   const handler = useRef(onReachEnd);
 

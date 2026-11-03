@@ -1,5 +1,5 @@
-import { ApiEnvelope } from '@/types/api';
-import { MeResponse } from '@/types/auth';
+import type { ApiEnvelope } from '@/types/api';
+import type { MeResponse } from '@/types/auth';
 import { BaseCursorAPI, serializeParams } from './baseCursorAPI';
 import { APP_ID, APP_ID_PARAM, AUTH_API_BASE, ENDPOINTS } from './endpoints';
 

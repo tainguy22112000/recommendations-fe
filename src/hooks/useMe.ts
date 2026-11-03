@@ -1,9 +1,10 @@
-import { useMutation, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
+import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import { AuthAPI } from '@/api/authAPI';
 import { LOGIN_PATH } from '@/lib/navigate';
-import { MeResponse } from '@/types/auth';
+import type { MeResponse } from '@/types/auth';
 
 export const ME_QUERY_KEY = ['me'] as const;
 
@@ -17,7 +18,7 @@ export function useMe(): UseQueryResult<MeResponse> {
   });
 }
 
-export function useLogout() {
+export function useLogout(): UseMutationResult<void, Error, void> {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -27,7 +28,7 @@ export function useLogout() {
     },
     onSettled: () => {
       queryClient.clear();
-      navigate(LOGIN_PATH, { replace: true });
+      void navigate(LOGIN_PATH, { replace: true });
     },
   });
 }

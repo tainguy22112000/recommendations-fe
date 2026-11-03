@@ -1,4 +1,4 @@
-import { ICursorResponse } from './api';
+import type { CursorResponse } from './api';
 
 export type Category = 'food' | 'cafe';
 export type PriceLevel = 1 | 2 | 3;
@@ -8,7 +8,7 @@ export type MinRating = 3.5 | 4 | 4.5;
 export type SortKey =
   'relevant' | 'nearest' | 'rating' | 'price_asc' | 'price_desc' | 'newest' | 'name' | 'open_first';
 
-export interface IPlace {
+export interface Place {
   id: string;
   name: string;
   category: Category;
@@ -54,7 +54,7 @@ export interface SearchQuery {
   sort: SortKey;
 }
 
-export type PlaceCursorPage = ICursorResponse<IPlace>;
+export type PlaceCursorPage = CursorResponse<Place>;
 
 export type MediaCategory = 'food' | 'space' | 'menu' | 'video';
 
@@ -68,7 +68,7 @@ export interface MediaItem {
   source: 'owner' | 'guest';
 }
 
-export interface PlaceDetail extends IPlace {
+export interface PlaceDetail extends Place {
   address: string;
   district: string;
   media: MediaItem[];

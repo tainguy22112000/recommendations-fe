@@ -5,12 +5,12 @@ import { useLocale } from '@/hooks/useLocale';
 import { formatDecimal, formatDistance, formatVnd } from '@/lib/format';
 import { HeartIcon, StarIcon } from '@/lib/icons';
 import { cn } from 'cn';
-import { IPlace } from '@/types/place';
+import type { Place } from '@/types/place';
 import PlaceStatus from './PlaceStatus';
 import PriceLevel from './PriceLevel';
 
 interface Props {
-  place: IPlace;
+  place: Place;
   onToggleSave: (id: string) => void;
 }
 
@@ -26,11 +26,11 @@ export default function PlaceCard({ place, onToggleSave }: Props) {
       <button
         type="button"
         onClick={() => {
-          navigate(`/place/${place.id}`);
+          void navigate(`/place/${place.id}`);
         }}
-        className="focus-visible:ring-ring block w-full text-left focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+        className="block w-full text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
       >
-        <div className="rounded-card bg-surface-2 relative h-[156px] w-full overflow-hidden">
+        <div className="relative h-[156px] w-full overflow-hidden rounded-card bg-surface-2">
           {place.cover_photo_url !== undefined && (
             <img
               src={place.cover_photo_url}
@@ -41,11 +41,11 @@ export default function PlaceCard({ place, onToggleSave }: Props) {
           )}
 
           <div className="absolute top-3 left-3 flex gap-2">
-            <span className="rounded-chip bg-surface/95 text-ink px-2.5 py-1 text-xs font-semibold">
+            <span className="rounded-chip bg-surface/95 px-2.5 py-1 text-xs font-semibold text-ink">
               {place.category === 'food' ? t('place.food') : t('place.cafe')}
             </span>
             {place.status === 'pending' && (
-              <span className="rounded-chip bg-tint text-tint-ink px-2.5 py-1 text-xs font-semibold">
+              <span className="rounded-chip bg-tint px-2.5 py-1 text-xs font-semibold text-tint-ink">
                 {t('place.pending')}
               </span>
             )}
@@ -64,13 +64,13 @@ export default function PlaceCard({ place, onToggleSave }: Props) {
             <PriceLevel level={place.price_level} />
           </div>
 
-          <p className="text-ink-2 flex items-center gap-1.5 text-sm">
+          <p className="flex items-center gap-1.5 text-sm text-ink-2">
             {place.rating === null ? (
               <span>{t('place.noRating')}</span>
             ) : (
               <>
-                <StarIcon aria-hidden="true" className="fill-star text-star size-4" />
-                <span className="text-ink font-semibold">
+                <StarIcon aria-hidden="true" className="size-4 fill-star text-star" />
+                <span className="font-semibold text-ink">
                   {formatDecimal(place.rating, locale)}
                 </span>
                 <span>{t('count.reviews', { count: place.review_count })}</span>
@@ -84,7 +84,7 @@ export default function PlaceCard({ place, onToggleSave }: Props) {
             </span>
           </p>
 
-          <p className="text-ink-2 truncate text-sm">{place.street}</p>
+          <p className="truncate text-sm text-ink-2">{place.street}</p>
           <PlaceStatus place={place} />
         </div>
       </button>
@@ -96,7 +96,7 @@ export default function PlaceCard({ place, onToggleSave }: Props) {
         onClick={() => {
           onToggleSave(place.id);
         }}
-        className="bg-surface/95 focus-visible:ring-ring absolute top-3 right-3 z-10 grid size-11 place-items-center rounded-full shadow-sm focus-visible:ring-2 focus-visible:outline-none"
+        className="absolute top-3 right-3 z-10 grid size-11 place-items-center rounded-full bg-surface/95 shadow-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
       >
         <HeartIcon
           aria-hidden="true"
@@ -110,10 +110,10 @@ export default function PlaceCard({ place, onToggleSave }: Props) {
 export function PlaceCardSkeleton() {
   return (
     <div aria-hidden="true" className="space-y-2.5">
-      <div className="rounded-card bg-skel h-[156px] w-full" />
-      <div className="bg-skel h-4 w-2/3 rounded" />
-      <div className="bg-skel h-3.5 w-1/2 rounded" />
-      <div className="bg-skel h-3.5 w-1/3 rounded" />
+      <div className="h-[156px] w-full rounded-card bg-skel" />
+      <div className="h-4 w-2/3 rounded bg-skel" />
+      <div className="h-3.5 w-1/2 rounded bg-skel" />
+      <div className="h-3.5 w-1/3 rounded bg-skel" />
     </div>
   );
 }

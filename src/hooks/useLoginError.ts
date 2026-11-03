@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 
 import { loginErrorMessage, parseLoginErrorCode } from '@/lib/errors';
-import { LoginErrorCode } from '@/types/errors';
+import type { LoginErrorCode } from '@/types/errors';
 
 interface LoginError {
   code: LoginErrorCode;

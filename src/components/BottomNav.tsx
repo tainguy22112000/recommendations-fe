@@ -22,10 +22,7 @@ export default function BottomNav() {
   const { t } = useTranslation();
 
   return (
-    <nav
-      className="bg-surface border-line sticky bottom-0 z-30 border-t"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-    >
+    <nav className="sticky bottom-0 z-30 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)]">
       <ul className="mx-auto flex w-full max-w-[480px] items-stretch">
         {ITEMS.map(({ to, labelKey, Icon, enabled }) => {
           return (
@@ -36,7 +33,7 @@ export default function BottomNav() {
                   className={({ isActive }) => {
                     return cn(
                       'flex h-14 min-h-11 flex-col items-center justify-center gap-0.5',
-                      isActive ? 'text-primary font-bold' : 'text-ink-2 font-medium',
+                      isActive ? 'font-bold text-primary' : 'font-medium text-ink-2',
                     );
                   }}
                 >
@@ -47,7 +44,7 @@ export default function BottomNav() {
                 <span
                   aria-disabled="true"
                   title={t('nav.comingSoon')}
-                  className="text-ink-3 flex h-14 min-h-11 cursor-not-allowed flex-col items-center justify-center gap-0.5 font-medium"
+                  className="flex h-14 min-h-11 cursor-not-allowed flex-col items-center justify-center gap-0.5 font-medium text-ink-3"
                 >
                   <Icon aria-hidden="true" className="size-6" />
                   <span className="text-[11px] leading-none">{t(labelKey)}</span>

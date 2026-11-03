@@ -17,7 +17,7 @@ export default function DiscoverToolbar({ onOpenFilters, onOpenSort }: Props) {
   const sortIsDefault = query.sort === 'relevant';
 
   return (
-    <div className="bg-surface border-line sticky top-0 z-20 border-y">
+    <div className="sticky top-0 z-20 border-y border-line bg-surface">
       <div className="flex items-center gap-2 px-4 py-2.5">
         <button
           type="button"
@@ -31,7 +31,7 @@ export default function DiscoverToolbar({ onOpenFilters, onOpenSort }: Props) {
           <SlidersIcon aria-hidden="true" className="size-5" />
           {t('discover.filters')}
           {activeCount > 0 && (
-            <span className="bg-primary text-primary-foreground grid size-5 place-items-center rounded-full text-xs font-bold">
+            <span className="grid size-5 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
               {activeCount}
             </span>
           )}
@@ -50,11 +50,11 @@ export default function DiscoverToolbar({ onOpenFilters, onOpenSort }: Props) {
             <span className="text-ink-2">{t('discover.sortPrefix')} </span>
             <span className="font-semibold">{t(SORT_LABEL_KEYS[query.sort])}</span>
           </span>
-          <ChevronDownIcon aria-hidden="true" className="text-ink-2 size-4 shrink-0" />
+          <ChevronDownIcon aria-hidden="true" className="size-4 shrink-0 text-ink-2" />
         </button>
       </div>
 
-      <ul className="flex gap-2 overflow-x-auto px-4 pb-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <ul className="flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 pb-2.5 [&::-webkit-scrollbar]:hidden">
         {QUICK_FILTERS.map((filter) => {
           const active = filter.isActive(query);
 
@@ -67,7 +67,7 @@ export default function DiscoverToolbar({ onOpenFilters, onOpenSort }: Props) {
                   update(filter.toggle);
                 }}
                 className={cn(
-                  'rounded-chip flex h-11 items-center gap-1.5 border px-3.5 text-sm font-medium whitespace-nowrap',
+                  'flex h-11 items-center gap-1.5 rounded-chip border px-3.5 text-sm font-medium whitespace-nowrap',
                   active
                     ? 'border-primary bg-tint text-tint-ink'
                     : 'border-line bg-surface text-ink',
