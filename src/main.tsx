@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from 'react-router-dom';
 import { ThemeProvider } from 'next-themes';
+import { Analytics } from '@vercel/analytics/react';
 
 import { Toaster } from '@/components/ui/sonner';
 import '@/i18n';
@@ -29,6 +30,7 @@ createRoot(root).render(
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
         <Toaster />
+        <Analytics />
       </QueryClientProvider>
     </ThemeProvider>
   </StrictMode>,
